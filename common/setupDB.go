@@ -9,11 +9,11 @@ import (
 
 func SetupDB() *sql.DB {
 	err := godotenv.Load()
-	CheckError(err)
+	CheckError("Dotenv Error: ", err)
 
 	connStr := os.Getenv("DATABASE_URL")
 	db, err := sql.Open("postgres", connStr)
-    CheckError(err)
+    CheckError("Connetion Error: ", err)
 
     return db
 }

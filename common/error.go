@@ -1,9 +1,9 @@
 package common
 
-import "log"
+import "fmt"
 
-func CheckError(err error) {
+func CheckError(message string, err error) {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(message, err)
 	}
 }
