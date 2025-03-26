@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	common "github.com/ankush263/e-commerce-api/common"
@@ -25,6 +27,8 @@ var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // This function will generate the JWT token with userid and email.
 func generateJWT(userid int, email string) (string, error) {
+	// 'Claims' in JWT are the key-value pairs that contains user specific info.
+	// They are the part of 'payload' section in JWT (Header, Payload, Signature).
     claims := MyCustomClaims{
         userid,
         email,
@@ -88,6 +92,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
+	// Compare the user password form JSON body with stored password in DB.
 	if err := bcrypt.CompareHashAndPassword([]byte(response.Data.Password), []byte(*reqUser.Password)); err != nil {
 		json.NewEncoder(w).Encode(model.ResponseModel{
 			Status: 0,
@@ -189,5 +194,57 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Deleted")
 	} else {
 		json.NewEncoder(w).Encode("Failed to delete the user")
+	}
+}
+
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the cookie
+		cookie, err := r.Cookie("token")
+
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// parse the JWT token and return the jwt secret (https://chatgpt.com/c/67e43439-a72c-8007-9a85-3b22ebe14c7d)
+		token, err := jwt.ParseWithClaims(cookie.Value, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return jwtSecret, nil
+		})
+
+		if err != nil || !token.Valid {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		claims, ok := token.Claims.(*MyCustomClaims)
+		if !ok {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+		
+		ctx := context.WithValue(r.Context(), "user_id", strconv.Itoa(claims.Userid))
+		next.ServeHTTP(w, r.WithContext(ctx))
+
+	})
+}
+
+func GetProfile(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("user_id").(string)
+
+	userdata := utils.GetSingleUserInDB(userId)
+
+	if userdata.Status == 0 {
+		json.NewEncoder(w).Encode(model.ResponseModel{
+			Status: 0,
+			Message: "User with that id doesn't exists",
+			Data: nil,
+		})
+	} else {
+		json.NewEncoder(w).Encode(model.ResponseModel{
+			Status: 1,
+			Message: "Success",
+			Data: userdata.Data,
+		})
 	}
 }
