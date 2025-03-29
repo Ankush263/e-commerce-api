@@ -66,13 +66,33 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var reqUser model.UsersModel
 	_ = json.NewDecoder(r.Body).Decode(&reqUser)
 
-	user, err := utils.CreateUserInDB(reqUser)
+	queryParams := r.URL.Query()
+	usertype := queryParams.Get("usertype")
 
-	common.CheckError("Create User Error: ", err)
+	if usertype == "seller" {
+		reqUser.Role = "seller"
+	} else {
+		reqUser.Role = "customer"
+	}
 
-	setJWTToken(w, user, reqUser)
+	createUserResponse := utils.CreateUserInDB(reqUser)
 
-	json.NewEncoder(w).Encode(user)
+	if createUserResponse.Status == 0 {
+		json.NewEncoder(w).Encode(model.ResponseModel{
+			Status: 0,
+			Message: createUserResponse.Error,
+			Data: nil,
+		})
+	} else {
+		setJWTToken(w, createUserResponse.Data, reqUser)
+
+		json.NewEncoder(w).Encode(model.ResponseModel{
+			Status: 0,
+			Message: "Success",
+			Data: createUserResponse.Data,
+		})
+	}
+
 }
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {

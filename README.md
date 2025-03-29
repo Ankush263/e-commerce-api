@@ -14,7 +14,7 @@
         - updated_at
     - ### Store Model
         - id
-        - user
+        - owner
         - name
         - description
         - store_type

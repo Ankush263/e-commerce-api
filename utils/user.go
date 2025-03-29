@@ -9,13 +9,19 @@ import (
 )
 
 
+type CreateUserResponse struct {
+    Status int `json:"status"`
+    Error error `json:"error"`
+    Data Models.ResponseUsersModel `json:"data"`
+}
+
 type UsersResponse struct {
     Status int `json:"status"`
     Data *[]Models.ResponseUsersModel `json:"data"`
 }
 
 
-func CreateUserInDB(user Models.UsersModel) (Models.ResponseUsersModel, error) {
+func CreateUserInDB(user Models.UsersModel) CreateUserResponse {
     db := common.SetupDB()
     var response Models.ResponseUsersModel
 
@@ -23,21 +29,31 @@ func CreateUserInDB(user Models.UsersModel) (Models.ResponseUsersModel, error) {
     hashedPassword, hasherror := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
     common.CheckError("Password Hashing Error: ", hasherror)
 
-    err := db.QueryRow(`INSERT INTO users(username, email, password, phone) 
-                        VALUES($1, $2, $3, $4) 
-                        RETURNING id, created_at, updated_at, username, email, password, phone`,
-        user.UserName, user.Email, string(hashedPassword), user.Phone).Scan(
+    err := db.QueryRow(`INSERT INTO users(username, email, password, role, phone) 
+                        VALUES($1, $2, $3, $4, $5) 
+                        RETURNING id, created_at, updated_at, username, email, password, role, phone`,
+        user.UserName, user.Email, string(hashedPassword), user.Role, user.Phone).Scan(
             &response.ID, 
             &response.CreatedAt, 
             &response.UpdatedAt, 
             &response.UserName, 
             &response.Email, 
             &response.Password, 
+            &response.Role, 
             &response.Phone)
 
     common.CheckError("Error: ", err)
+    if err != nil {
+        return CreateUserResponse{
+            Status: 0,
+            Error: err,
+        }
+    }
 
-    return response, nil
+    return CreateUserResponse{
+        Status: 1,
+        Data: response,
+    } 
 }
 
 func GetUsersFromDB() UsersResponse {

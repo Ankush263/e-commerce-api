@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	userRouter "github.com/ankush263/e-commerce-api/routers"
+	router "github.com/ankush263/e-commerce-api/routers"
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
@@ -37,7 +37,7 @@ func main() {
 	fmt.Println("Connected to database successfully")
 
 	// Initialize router
-	router := userRouter.UserRouter()
+	router := router.Router()
 
 	// Start server
 	port := os.Getenv("PORT")

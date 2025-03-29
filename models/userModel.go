@@ -6,6 +6,7 @@ type UsersModel struct {
 	UserName *string `json:"username" binding:"required,alphanum"`
 	Email    *string `json:"email" binding:"required,email"`
 	Password *string `json:"password" binding:"required,min=8,max=20"`
+	Role string `json:"role"`
 	Phone    *string `json:"phone" binding:"required,min=10,max=12"`
 }
 
@@ -16,6 +17,7 @@ type ResponseUsersModel struct {
 	UserName  string `json:"username" binding:"required,alphanum"`
 	Email     string `json:"email" binding:"required,email"`
 	Password  string `json:"password" binding:"required,min=8,max=20"`
+	Role  string `json:"role"`
 	Phone     string `json:"phone" binding:"required,min=10,max=12"`
 }
 
@@ -26,6 +28,7 @@ type ResponseDBModel struct {
 
 type ResponseModel struct {
 	Status int   `json:"status"`
-	Message string `json:"message,omitempty"`
+	Message interface{} `json:"message,omitempty"`
 	Data interface{} `json:"data,omitempty"`
+	Error error `json:"error,omitempty"`
 }
