@@ -23,7 +23,11 @@ func Router() *mux.Router {
 	router.HandleFunc("/api/v1/user/{id}", controller.DeleteUserById).Methods("DELETE")
 
 	router.Handle("/api/v1/store/create", controller.AuthMiddleware(http.HandlerFunc(controller.CreateStore))).Methods("POST")
-	// router.HandleFunc("/api/v1/user/create", controller.CreateStore).Methods("GET")
+	router.HandleFunc("/api/v1/store", controller.GetAllStores).Methods("GET")
+	router.HandleFunc("/api/v1/store/{id}", controller.GetSingleStore).Methods("GET")
+	router.Handle("/api/v1/store/{id}", controller.AuthMiddleware(http.HandlerFunc(controller.UpdateStore))).Methods("PATCH")
+	router.Handle("/api/v1/store/{id}", controller.AuthMiddleware(http.HandlerFunc(controller.DeleteStore))).Methods("DELETE")
+	router.HandleFunc("/api/v1/store/id/{storeid}", controller.GetStoreByStoreid).Methods("GET")
 
 	router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		path, err := route.GetPathTemplate()

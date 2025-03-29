@@ -105,13 +105,14 @@ func GetSingleUserInDB(id string) Models.ResponseDBModel {
     db := common.SetupDB()
 
     var response Models.ResponseUsersModel
-    err := db.QueryRow(`SELECT id, created_at, updated_at, username, email, password, phone FROM users WHERE id = $1`, id).Scan(
+    err := db.QueryRow(`SELECT id, created_at, updated_at, username, email, password, role, phone FROM users WHERE id = $1`, id).Scan(
         &response.ID,
         &response.CreatedAt,
         &response.UpdatedAt,
         &response.UserName,
         &response.Email,
         &response.Password,
+        &response.Role,
         &response.Phone,
     )
 
