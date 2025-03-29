@@ -1,4 +1,7 @@
-# Model Structure
+# E-commerce API (Go lang)
+- ### This repository features a straightforward e-commerce API developed in the GO programming language. It supports all CRUD operations and includes JWT authentication and tokenization. Users can set up stores, manage products, sell items, and purchase new products from the store.
+
+# DB Structure
 - ## E - commerce API
     - ### User Model
         - id 
@@ -28,5 +31,14 @@
         - owner
         - store_id
         - price
+        - created_at
+        - updated_at
+    - ### Buy Model
+        - id
+        - user
+        - owner
+        - product
+        - store_id
+        - total_price
         - created_at
         - updated_at
