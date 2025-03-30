@@ -165,7 +165,8 @@ func UpdateSingleUserById(user Models.UsersModel, id string) Models.ResponseDBMo
         SET 
             username = COALESCE($1, username),
             email = COALESCE($2, email),
-            phone = COALESCE($3, phone)
+            phone = COALESCE($3, phone),
+            updated_at = NOW()
         WHERE id = $4
         RETURNING id, created_at, updated_at, username, email, phone, password;
     `,user.UserName, user.Email, user.Phone, id).Scan(

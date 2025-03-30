@@ -18,5 +18,5 @@ type StoreResponseModel struct {
 	Name        string    `json:"name" binding:"required,alphanum"`
 	Description string    `json:"description"`
 	StoreType   string  `json:"store_type" binding:"required"`
-	Storeid     string       `json:"storeid" binding:"required"`
+	Storeid     string       `json:"store_id" binding:"required"`
 }

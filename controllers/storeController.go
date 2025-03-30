@@ -173,8 +173,8 @@ func GetStoreByStoreid(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CheckOwner(id string, userId string) bool {
-	response := utils.GetSingleStoreFromDB(id)
+func CheckOwner(storeid string, userId string) bool {
+	response := utils.GetSingleStoreFromDB(storeid)
 
 	if response.Status == 0 {
 		return false
@@ -241,7 +241,7 @@ func DeleteStore(w http.ResponseWriter, r *http.Request) {
 	isOwner := CheckOwner(id, userId)
 
 	if !isOwner {
-		json.NewEncoder(w).Encode(models.ResponseModel{
+		json.NewEncoder(w).Encode(model.ResponseModel{
 			Status: 0,
 			Message: "Only owner of the store can delete the store.",
 		})

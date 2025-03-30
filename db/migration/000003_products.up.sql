@@ -1,10 +1,10 @@
-CREATE TABLE stores (
+CREATE TABLE products (
     id SERIAL PRIMARY KEY,
-    owner INTEGER REFERENCES users(id),
     name VARCHAR NOT NULL,
     description VARCHAR NOT NULL,
-    store_type VARCHAR,
-    store_id VARCHAR NOT NULL UNIQUE,
+    owner INTEGER REFERENCES users(id),
+    store_id VARCHAR REFERENCES stores(store_id) ON DELETE CASCADE, 
+    price INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-)
+);

@@ -127,6 +127,35 @@ func GetSingleStoreFromDB(id string) CreateStoreResponse {
 	}
 }
 
+func GetStoreByUserid(userid string) CreateStoreResponse {
+	db := common.SetupDB()
+
+	var response Models.StoreResponseModel
+
+	err := db.QueryRow(`SELECT id, created_at, updated_at, name, owner, description, store_type, store_id FROM stores WHERE owner = $1`, userid).Scan(
+		&response.ID,
+		&response.CreatedAt,
+		&response.UpdatedAt,
+		&response.Name,
+		&response.Owner,
+		&response.Description,
+		&response.StoreType,
+		&response.Storeid,
+	)
+
+	if err != nil {
+		return CreateStoreResponse{
+			Status: 0,
+			Error: err,
+		}
+	}
+
+	return CreateStoreResponse{
+		Status: 1,
+		Data: &response,
+	}
+}
+
 func GetSingleStoreByStoreId(storeid string) CreateStoreResponse {
 	db := common.SetupDB()
 
@@ -165,7 +194,8 @@ func UpdateStore(store Models.StoreModel, id string) CreateStoreResponse {
 		SET
 			name = COALESCE($1, name),
 			description = COALESCE($2, description),
-			store_type = COALESCE($3, store_type)
+			store_type = COALESCE($3, store_type),
+			updated_at = NOW()
 		WHERE id = $4
 		RETURNING  id, created_at, updated_at, name, owner, description, store_type, store_id;
 	`, store.Name, store.Description, store.StoreType, id).Scan(
